@@ -2,9 +2,9 @@
 
 ## Introduction
 
-This project is a comprehensive implementation of a machine learning pipeline to solve an image classification task using Convolutional Neural Networks (CNNs). The dataset chosen is the Street View House Numbers (SVHN) dataset, which consists of over 600,000 digit images taken from real-world photos of house numbers. This task is representative of practical applications in optical character recognition (OCR), automated postal systems, and smart city technologies.
+This project demonstrates a full machine learning pipeline designed to classify images from the Street View House Numbers (SVHN) dataset, which consists of over 600,000 digit images taken from real-world photos of house numbers, using Convolutional Neural Networks (CNNs). The pipeline spans from data acquisition to model evaluation and prediction on unseen data. CNNs are particularly suited for image classification tasks due to their ability to capture spatial hierarchies.
 
-The goal of this project is to design, implement, and evaluate a CNN that can accurately classify single digits from these images. The pipeline encompasses the entire machine learning workflow, including data acquisition, preprocessing, exploratory data analysis (EDA), model construction, model evaluation, and final predictions.
+The codebase and approach were adapted and expanded from a Kaggle notebook: [SVHN Classification with CNN Keras (96% Accuracy)](https://www.kaggle.com/code/dimitriosroussis/svhn-classification-with-cnn-keras-96-acc). Key steps were reproduced and extended to meet coursework requirements and enable model customization and improvement.
 
 ## Business Objectives
 
@@ -19,9 +19,15 @@ A high-performing model will not only classify digits accurately but also genera
 
 ### 1. Data Collection and Validation
 
-The dataset was downloaded using `gdown` from Google Drive. The two datasets used were:
+We used the cropped MNIST-like 32-by-32 images centered around a single character dataset instead of the full number one due to reduce the pre-processing.
+The dataset was downloaded onto a google drive then downloaded from the google drive to the notebook using `gdown`. The two datasets used were:
 - `train_32x32.mat`: The primary dataset for training the CNN model.
 - `test_32x32.mat`: A separate dataset reserved for evaluating final model performance.
+
+```python
+gdown.download("https://drive.google.com/uc?id=1FSwCLJzPzL4ZmihRgjIkh3DImRwM0UHb", "train_32x32.mat")
+gdown.download("https://drive.google.com/uc?id=10E7i5m1HaGWZkte4P8WMouNoFj0dFHmv", "test_32x32.mat")
+```
 
 The data was loaded using `scipy.io.loadmat`, which reads MATLAB files into Python dictionaries. The images were initially stored in a 4D array with shape `(32, 32, 3, N)`, which was transposed to match the expected input shape for CNNs: `(N, 32, 32, 3)`.
 
@@ -40,23 +46,50 @@ EDA focused on understanding the structure, balance, and quality of the dataset:
 - Pixel intensity distributions confirmed the images were appropriately scaled
 - The label distribution was visualized using Seaborn count plots
 
-Further investigation into misclassified digits from early model versions informed later decisions around dropout and data augmentation.
+EDA showed a well-distributed dataset across classes, with minor variations in sample count per class.
 
 ### 3. Model Building
 
-The CNN architecture was designed to balance performance and complexity, leveraging:
-- Two convolutional layers with ReLU activation for local feature extraction
-- MaxPooling layers to downsample feature maps and reduce overfitting
-- Dropout layers at 25% and 50% to improve generalization and prevent overfitting
-- A dense layer with 128 neurons as the fully connected stage
-- A final dense layer with 10 outputs and softmax activation to classify the digits
+The CNN architecture was inspired by the referenced Kaggle notebook and consists of:
+- Three `Conv2D` layers with increasing filter depth with ReLU activation for local feature extraction
+- MaxPooling after each convolution block to downsample feature maps and reduce overfitting
+- Dropout layers to improve generalization and prevent overfitting
+- A fully connected `Dense` layer 
+- An output layer with `softmax` activation for multi-class classification
 
-The model was compiled with:
-- `categorical_crossentropy` loss function (suitable for multi-class classification)
-- `Adam` optimizer, chosen for its adaptive learning rate and efficient convergence
-- `accuracy` as the evaluation metric
-
-Batch size, dropout rates, and number of filters were optimized based on performance during validation.
+```python
+aux_model = keras.Sequential([
+    keras.layers.Conv2D(32, (3, 3), padding='same', 
+                           activation='relu',
+                           input_shape=(32, 32, 3)),
+    keras.layers.BatchNormalization(),
+    keras.layers.Conv2D(32, (3, 3), padding='same', 
+                        activation='relu'),
+    keras.layers.MaxPooling2D((2, 2)),
+    keras.layers.Dropout(0.3),
+    
+    keras.layers.Conv2D(64, (3, 3), padding='same', 
+                           activation='relu'),
+    keras.layers.BatchNormalization(),
+    keras.layers.Conv2D(64, (3, 3), padding='same',
+                        activation='relu'),
+    keras.layers.MaxPooling2D((2, 2)),
+    keras.layers.Dropout(0.3),
+    
+    keras.layers.Conv2D(128, (3, 3), padding='same', 
+                           activation='relu'),
+    keras.layers.BatchNormalization(),
+    keras.layers.Conv2D(128, (3, 3), padding='same',
+                        activation='relu'),
+    keras.layers.MaxPooling2D((2, 2)),
+    keras.layers.Dropout(0.3),
+    
+    keras.layers.Flatten(),
+    keras.layers.Dense(128, activation='relu'),
+    keras.layers.Dropout(0.4),    
+    keras.layers.Dense(10,  activation='softmax')
+])
+```
 
 ### 4. Model Evaluation
 
@@ -112,6 +145,12 @@ Given more time and resources, the following improvements could be pursued:
 - **SciPy.io**: Functionality for loading MATLAB `.mat` files
 - **Scikit-learn**: Utility for splitting datasets, computing metrics, and preprocessing
 - **gdown**: Downloads files directly from Google Drive for dataset access
+
+## Challenges Faced
+
+### Limited Resources on GitHub Codespaces
+
+One of the primary challenges encountered was the limited memory capacity of GitHub Codespaces. During training, especially when attempting to increase model complexity or train for more epochs, the kernel frequently crashed. This constrained our ability to perform more extensive experiments and hyperparameter tuning.
 
 ## Unfixed Bugs
 
