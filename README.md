@@ -84,8 +84,8 @@ aux_model = keras.Sequential([
     keras.layers.MaxPooling2D((2, 2)),
     keras.layers.Dropout(0.3),
     
-    keras.layers.Flatten(),
-    keras.layers.Dense(128, activation='relu'),
+    keras.layers.GlobalAveragePooling2D(),
+    keras.layers.Dense(32, activation='relu'),
     keras.layers.Dropout(0.4),    
     keras.layers.Dense(10,  activation='softmax')
 ])
@@ -99,9 +99,11 @@ The model was trained over several epochs with early stopping based on validatio
 - Visualizing a confusion matrix to identify misclassification trends
 
 Hyperparameter tuning experiments included:
+- Removed Flatten() and replaced it with GlobalAveragePooling2D() and changed the final dense layer to 32, to increase performance to allow for a larger sample size
 - Varying the number of filters in convolutional layers (e.g., 32, 64, 128)
-- Testing different dropout values (0.3, 0.5)
+- Testing different dropout values (0.3, 0.4), we found the best values to be 0.3 and 0.4 as these had the highest accuracy and relatievly fast speed
 - Adjusting the number of epochs and batch sizes
+- Flipping the layers upside down (starting with 128 and going down to 32), this cause each epoch to take very long and resulted in a crash
 
 Each trained model was logged, and the best-performing configuration was retained based on validation accuracy.
 
