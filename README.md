@@ -115,7 +115,7 @@ The final model was used to predict labels on the test dataset (previously unsee
 - Misclassified samples were examined to identify common causes of error
 
 The model achieved:
-- Test set accuracy: ~91.4%
+- Test set accuracy: 87% which is below our 90% goal however this is mainly due to the smaller sample size we had to use
 - Strong performance on most digits, though some confusion persisted between similar-looking digits like 3 and 5
 
 ## Jupyter Notebook Structure
