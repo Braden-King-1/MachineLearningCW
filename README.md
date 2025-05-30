@@ -136,7 +136,6 @@ Given more time and resources, the following improvements could be pursued:
 - **Data Augmentation**: Implement transformations (rotation, shift, zoom) to increase dataset variability
 - **Transfer Learning**: Use pre-trained models like ResNet or MobileNet for enhanced performance
 - **Model Optimization**: Implement Keras Tuner or grid search for hyperparameter optimization
-- **Model Deployment**: Convert to TensorFlow Lite or ONNX for mobile/edge deployment
 - **Advanced Architectures**: Explore deeper CNNs or architectures like Capsule Networks for better generalization
 
 ## Libraries and Modules
